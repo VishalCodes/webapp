@@ -3,6 +3,7 @@ pipeline {
     tools {
         maven 'Maven'
     }
+
     stages {
         stage ('Initialize') {
             steps {
@@ -12,10 +13,21 @@ pipeline {
                    ''' 
             }
         }
+
         stage ('Build stage') {
             steps {
             sh 'mvn clean package'
             }
         }
+
+        stage ('Deploy-To-Tomcat') {
+            steps {
+           sshagent(['tomcat']) {
+                sh 'scp -o StrictHostKeyChecking=no target/*.war ubuntu@52.88.238.144:/prod/apache-tomcat-8.5.66/webapps/webapp.war'
+              }      
+           }       
+        }
+
+        
     }
 }
